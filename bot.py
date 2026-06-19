@@ -35,19 +35,17 @@ class WorldCupBot:
         self.ultima_consulta_api = 0
         self.ultimo_comando_partidos = 0
         self.lock = threading.Lock()
+        
+        try:
+            import json
+            with open("fifa_flags.json", "r") as f:
+                self.flags = json.load(f)
+        except Exception as e:
+            logging.error(f"Error cargando banderas: {e}")
+            self.flags = {}
 
     def get_flag(self, abbreviation):
-        flags = {
-            "COL": "🇨🇴", "UZB": "🇺🇿", "ARG": "🇦🇷", "BRA": "🇧🇷", "MEX": "🇲🇽", 
-            "USA": "🇺🇸", "ESP": "🇪🇸", "FRA": "🇫🇷", "GER": "🇩🇪", "ENG": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-            "ITA": "🇮🇹", "POR": "🇵🇹", "URU": "🇺🇾", "ECU": "🇪🇨", "CHI": "🇨🇱",
-            "PER": "🇵🇪", "VEN": "🇻🇪", "PAR": "🇵🇾", "BOL": "🇧🇴", "AUT": "🇦🇹",
-            "NED": "🇳🇱", "BEL": "🇧🇪", "CRO": "🇭🇷", "JPN": "🇯🇵", "KOR": "🇰🇷",
-            "MAR": "🇲🇦", "SEN": "🇸🇳", "CAN": "🇨🇦", "CRC": "🇨🇷", "KSA": "🇸🇦",
-            "AUS": "🇦🇺", "TUN": "🇹🇳", "QAT": "🇶🇦", "WAL": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "POL": "🇵🇱",
-            "SRB": "🇷🇸", "SUI": "🇨🇭", "CMR": "🇨🇲", "GHA": "🇬🇭", "IRN": "🇮🇷"
-        }
-        return flags.get(abbreviation, "🏳️")
+        return self.flags.get(abbreviation, "🏳️")
 
     def enviar_mensaje(self, texto):
         try:
@@ -222,6 +220,9 @@ class WorldCupBot:
                 f"⏱️ {clock}\n"
                 f"{home} {home_score} - {away_score} {away}"
             )
+
+        if status_state == "in" and previous_state["status_state"] == "pre":
+            self.enviar_mensaje(f"🟢 <b>¡Comienza el partido!</b>\n{home} {home_score} - {away_score} {away}")
 
         if status_name == "STATUS_HALFTIME" and previous_state["status_name"] != "STATUS_HALFTIME":
             self.enviar_mensaje(f"⏳ <b>¡Medio Tiempo!</b>\n{home} {home_score} - {away_score} {away}")
