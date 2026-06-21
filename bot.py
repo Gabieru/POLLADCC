@@ -221,6 +221,20 @@ class WorldCupBot:
                 f"{home} {home_score} - {away_score} {away}"
             )
 
+        if (home_score < previous_state["home_score"]) or (away_score < previous_state["away_score"]):
+            if home_score < previous_state["home_score"]:
+                equipo_afectado = info["home_name"]
+                bandera_afectado = info["home_flag"]
+            else:
+                equipo_afectado = info["away_name"]
+                bandera_afectado = info["away_flag"]
+
+            self.enviar_mensaje(
+                f"❌ <b>¡Gol Anulado!</b>\n"
+                f"Se ha invalidado el gol de {bandera_afectado} {equipo_afectado}.\n"
+                f"Marcador actualizado:\n{home} {home_score} - {away_score} {away}"
+            )
+
         if status_state == "in" and previous_state["status_state"] == "pre":
             self.enviar_mensaje(f"🟢 <b>¡Comienza el partido!</b>\n{home} {home_score} - {away_score} {away}")
 
